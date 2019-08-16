@@ -1,26 +1,5 @@
 'use strict';
 
-// const checkbox = document.querySelector('#discount-checkbox');
-
-// checkbox.addEventListener('change', function() {
-//     if (this.checked) {
-//         this.nextElementSibling.classList.add('checked');
-//     } else {
-//         this.nextElementSibling.classList.remove('checked');
-//     }
-// });
-// for (let i = 0; i < checkbox.length; i++ ){
-//     checkbox[i].addEventListener('change', function() {
-//              if (this.checked) {
-//                  this.nextElementSibling.classList.add('checked');
-//              } else {
-//                  this.nextElementSibling.classList.remove('checked');
-//              }
-//     });
-// };
-
-// console.dir(checkbox);
-
 // filter checkbox 
 
 function toggleCheckbox() {
@@ -37,8 +16,6 @@ function toggleCheckbox() {
     });
 
 }
-
-toggleCheckbox();
 
 // end filter checkbox
 
@@ -63,7 +40,6 @@ function toggleCart() {
     });
 }
 
-toggleCart();
 
 // end cart
 
@@ -118,8 +94,6 @@ function addCart() {
 
 }
 
-addCart();
-
 // end add cart
 
 // action page
@@ -134,40 +108,15 @@ function actionPage() {
 
     // discount checkbox
 
-    discountCheckbox.addEventListener('change', () => {
-        cards.forEach((card) => {
-            if (discountCheckbox.checked) {
-                if (!card.querySelector('.card-sale')) {
-                    card.parentNode.style.display = 'none';
-                }
-            } else {
-                card.parentNode.style.display = '';
-            }
-
-        });
-
-    });
+    discountCheckbox.addEventListener('change', filter);
 
     // end discount checkbox
 
     // filter price
 
-    min.addEventListener('change', filterPrice);
-    max.addEventListener('change', filterPrice);
+    min.addEventListener('change', filter);
+    max.addEventListener('change', filter);
 
-    function filterPrice() {
-        cards.forEach((card) => {
-            const cardPrice = card.querySelector('.card-price'),
-                price = parseFloat(cardPrice.textContent);
-            if ((min.value && price < min.value) || (max.value && price > max.value)) {
-                card.parentNode.style.display = 'none';
-            } else {
-                card.parentNode.style.display = '';
-
-            }
-
-        });
-    }
 
     // end filter price
 
@@ -187,6 +136,47 @@ function actionPage() {
     });
 
     // end search filter
+
+    function filter() {
+        cards.forEach((card) => {
+            const cardPrice = card.querySelector('.card-price'),
+                price = parseFloat(cardPrice.textContent),
+                discount = card.querySelector('.card-sale');
+
+            if ((min.value && price < min.value) || (max.value && price > max.value)) {
+                card.parentNode.style.display = 'none';
+            } else if (discountCheckbox.checked && !discount) {
+                card.parentNode.style.display = 'none';
+            } else {
+                card.parentNode.style.display = '';
+            }
+        });
+    }
 }
-actionPage();
+
 //end action page
+
+
+// get data 
+
+function getData() {
+
+    fetch('../db/db.json').then((response) => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error("Данные не были получены. Ошибка: " + response.status);
+        }
+
+    }).then(data => console.log(data))
+    .catch(err => console.warn(err));
+
+}
+
+// end get data
+
+getData();
+toggleCheckbox();
+toggleCart();
+addCart();
+actionPage();
